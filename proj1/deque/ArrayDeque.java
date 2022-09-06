@@ -1,7 +1,8 @@
 package deque;
 
+import java.util.Iterator;
 /** Array based list */
-public class ArrayDeque<T> implements Deque<T> {
+public class ArrayDeque<T> implements Deque<T>,Iterable<T>{
     private T[] items;
     private int size;
     private int first;
@@ -179,13 +180,10 @@ public class ArrayDeque<T> implements Deque<T> {
         if (other.size() != this.size()) {
             return false;
         }
-        Iterator<T> iter=other.iterator();
-        int i=0;
-        while (iter.hasNext()){
-            if(get(i)!=iter.next()){
+        for(int i=0;i<size;i++){
+            if(!(other.get(i).equals(get(i)))){
                 return false;
             }
-            i++;
         }
         return true;
     }

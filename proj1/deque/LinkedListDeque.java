@@ -1,12 +1,10 @@
 package deque;
 
-import net.sf.saxon.expr.ItemMappingFunction;
-
-import java.security.PublicKey;
+import java.util.Iterator;
 
 /** An LinkedListDeque is a list of items, which can traverse
  * both forwards and backwards */
-public class LinkedListDeque<T> implements Deque<T> {
+public class LinkedListDeque<T> implements Deque<T>,Iterable<T> {
     private class Node{
         public T item;
         public Node prev;
@@ -168,13 +166,10 @@ public class LinkedListDeque<T> implements Deque<T> {
         if (other.size() != this.size()) {
             return false;
         }
-        Iterator<T> iter=other.iterator();
-        Node p=first;
-        while (iter.hasNext()){
-            if(p.item!=iter.next()){
+        for(int i=0;i<size;i++){
+            if(!(other.get(i).equals(get(i)))){
                 return false;
             }
-            p=p.next;
         }
         return true;
     }
