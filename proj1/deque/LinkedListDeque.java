@@ -9,47 +9,38 @@ public class LinkedListDeque<T> implements Deque<T>,Iterable<T> {
         public T item;
         public Node prev;
         public Node next;
-        public Node(T i){
-            item=i;
+        public Node(T i,Node p,Node n){
+            item = i;
+            prev = p;
+            next = n;
         }
     }
 
-    private Node first;
-    private Node last;
+    private Node sentinel = new Node(null,null,null);
     private int size;
 
     /** Creates an empty list */
     public LinkedListDeque(){
-        first=null;
-        last=null;
-        size=0;
-    }
-    private Node addNode(T x){
-        Node t=new Node(x);
-        if(size==0){
-            t.prev=t;
-            t.next=t;
-            first=t;
-            last=t;
-        }else {
-            t.next=first;
-            t.prev=last;
-            last.next=t;
-            first.prev=t;
-        }
-        size++;
-        return t;
+        sentinel.next = sentinel;
+        sentinel.prev = sentinel;
+        size = 0;
     }
     public void addFirst(T x){
-        first=addNode(x);
+        Node newNode = new Node(x,sentinel,sentinel.next);
+        sentinel.next = newNode;
+        newNode.next.prev = newNode;
+        size++;
     }
 
     public void addLast(T x){
-        last=addNode(x);
+        Node newNode = new Node(x,sentinel.prev,sentinel);
+        sentinel.prev = newNode;
+        newNode.prev.next = newNode;
+        size++;
     }
 
     public boolean isEmpty(){
-        return size==0;
+        return size == 0;
     }
 
     public int size(){
@@ -57,67 +48,52 @@ public class LinkedListDeque<T> implements Deque<T>,Iterable<T> {
     }
 
     public void printDeque(){
-        Node t=first;
+        Node t = sentinel.next;
         int i;
-        for(i=0;i<size;i++){
+        for(i = 0;i < size;i++){
             System.out.print(t.item + " ");
-            t=t.next;
+            t = t.next;
         }
         System.out.print("\n");
     }
 
-    /** If the argument is 0, removes the first node
-    * If the argument is 1, removes the last node */
-    private T removeNode(int x){
-        if(size==0) {
+    public T removeFirst(){
+        if (isEmpty()) {
             return null;
         }
-        T t = null;
-        if(x==0){
-            t=first.item;
-        } else if (x==1) {
-            t=last.item;
-        }
-
-        if (size==1) {
-            first=null;
-            last=null;
-        } else{
-            if(x==0){
-                first=first.next;
-            } else if (x==1) {
-                last=last.prev;
-            }
-            first.prev=last;
-            last.next=first;
-        }
+        T item = sentinel.next.item;
+        sentinel.next = sentinel.next.next;
+        sentinel.next.prev = sentinel;
         size--;
-        return t;
-    }
-    public T removeFirst(){
-        return removeNode(0);
+        return item;
     }
 
     public T removeLast(){
-        return removeNode(1);
+        if (isEmpty()) {
+            return null;
+        }
+        T item = sentinel.prev.item;
+        sentinel.prev = sentinel.prev.prev;
+        sentinel.prev.next = sentinel;
+        size--;
+        return item;
     }
 
     public T get(int index){
-        Node t=first;
+        Node t = sentinel;
         int i;
-        for(i=0;i<size;i++){
-            if (i==index){
+        for(i = 0;i < size;i++){
+            if (i == index){
                 return t.item;
             }
-            t=t.next;
+            t = t.next;
         }
         return null;
     }
 
     private T getRecursiveHelper(Node p,int index){
-        Node pointer=p;
-        if(index==0){
-            return pointer.item;
+        if(index == 0){
+            return p.item;
         }else{
             return getRecursiveHelper(p.next,index-1);
         }
@@ -126,8 +102,7 @@ public class LinkedListDeque<T> implements Deque<T>,Iterable<T> {
         if(index>size-1){
             return null;
         }
-
-        return getRecursiveHelper(first,index);
+        return getRecursiveHelper(sentinel.next,index);
     }
 
     private class LinkedListDequeIterator implements Iterator<T>{
