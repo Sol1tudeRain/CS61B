@@ -23,9 +23,6 @@ public class Main {
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
-                if(args.length!=1){
-                    throw new GitletException("init command doesn't need arguments.");
-                }
                 init();
                 break;
             case "add":

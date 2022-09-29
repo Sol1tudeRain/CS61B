@@ -40,7 +40,7 @@ public class Commit implements Serializable, Cloneable{
         this.message=message;
         this.trackedFiles=new HashMap<>();
     }
-    
+
     public void save(){
         File commitPath=join(COMMITS_DIR,this.UID);
         writeObject(commitPath,this);
