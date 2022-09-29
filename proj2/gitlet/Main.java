@@ -14,7 +14,7 @@ public class Main {
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
-    public static void main(String[] args) throws IOException, CloneNotSupportedException {
+    public static void main(String[] args) throws CloneNotSupportedException {
         if (args.length == 0) {
             System.out.println("Please enter a command");
             System.exit(0);
@@ -26,7 +26,11 @@ public class Main {
                 init();
                 break;
             case "add":
-                add(args[1]);
+                try{
+                    add(args[1]);
+                }catch (IOException e){
+
+                }
                 break;
             case "commit":
                 commit(args[1]);
@@ -50,9 +54,17 @@ public class Main {
                 if(args.length==2){
                     checkoutBranch(args[1]);
                 } else if (args.length==3) {
-                    checkout(args[2]);
+                    try{
+                        checkout(args[2]);
+                    }catch (IOException ignored){
+
+                    }
                 } else if (args.length==4) {
-                    checkout(args[1],args[3]);
+                    try{
+                        checkout(args[1],args[3]);
+                    }catch (IOException ignored){
+
+                    }
                 }
                 break;
             case "branch":
