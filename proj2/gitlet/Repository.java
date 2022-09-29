@@ -134,7 +134,7 @@ public class Repository {
         gitletState.save();
     }
 
-    public static void commit(String message) throws CloneNotSupportedException {
+    public static void commit(String message) throws CloneNotSupportedException{
         // There must be a message for every commit.
         if(message==null){
             System.out.println("Please enter a commit message.");

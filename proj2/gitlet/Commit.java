@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,17 +24,6 @@ public class Commit implements Serializable, Cloneable{
      * variable is used. We've provided one example for `message`.
      */
 
-    /**
-     * A test main method
-     */
-    public static void main(String[] args){
-        Commit t=new Commit("This is a test.");
-        String SHA1_val=sha1(serialize(t));
-        t.date=new Date(0).toString();
-        String SHA1_val2=sha1(serialize(t));
-        System.out.println(SHA1_val);
-        System.out.println(SHA1_val2);
-    }
 
     /** The variables of this Commit. */
     public String message;
@@ -46,17 +36,18 @@ public class Commit implements Serializable, Cloneable{
      */
     public HashMap<String,String> trackedFiles;
 
-    public Commit(String message){
+    public Commit(String message) {
         this.message=message;
         this.trackedFiles=new HashMap<>();
     }
-
+    
     public void save(){
         File commitPath=join(COMMITS_DIR,this.UID);
         writeObject(commitPath,this);
     }
+    @SuppressWarnings("unchecked")
     @Override
-    public Object clone() throws CloneNotSupportedException{
+    public Object clone() throws CloneNotSupportedException {
         Commit ret=(Commit)super.clone(); // "ret" is the abbreviation of return
         ret.trackedFiles=(HashMap<String,String>)trackedFiles.clone();
         return ret;
