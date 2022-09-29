@@ -1,26 +1,64 @@
 package gitlet;
 
-// TODO: any imports you need here
+import java.io.File;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashMap;
 
-import java.util.Date; // TODO: You'll likely use this in this class
+import static gitlet.Repository.COMMITS_DIR;
+import static gitlet.Utils.*;
+
 
 /** Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
+ *  This file defines what the structure of a commit class looks like
+ *  and includes some methods.
  *
- *  @author TODO
+ *  @author Sol1tudeRain
  */
-public class Commit {
+public class Commit implements Serializable, Cloneable{
     /**
-     * TODO: add instance variables here.
      *
      * List all instance variables of the Commit class here with a useful
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided one example for `message`.
      */
 
-    /** The message of this Commit. */
-    private String message;
+    /**
+     * A test main method
+     */
+    public static void main(String[] args){
+        Commit t=new Commit("This is a test.");
+        String SHA1_val=sha1(serialize(t));
+        t.date=new Date(0).toString();
+        String SHA1_val2=sha1(serialize(t));
+        System.out.println(SHA1_val);
+        System.out.println(SHA1_val2);
+    }
 
-    /* TODO: fill in the rest of this class. */
+    /** The variables of this Commit. */
+    public String message;
+    public String parentID;
+    public String date;
+    public String UID;
+
+    /** A map used to save the relationship between filenames and their contents.
+     *  Filenames are normal names and contents are referred to by SHA-1 ID.
+     */
+    public HashMap<String,String> trackedFiles;
+
+    public Commit(String message){
+        this.message=message;
+        this.trackedFiles=new HashMap<>();
+    }
+
+    public void save(){
+        File commitPath=join(COMMITS_DIR,this.UID);
+        writeObject(commitPath,this);
+    }
+    @Override
+    public Object clone() throws CloneNotSupportedException{
+        Commit ret=(Commit)super.clone(); // "ret" is the abbreviation of return
+        ret.trackedFiles=(HashMap<String,String>)trackedFiles.clone();
+        return ret;
+    }
 }

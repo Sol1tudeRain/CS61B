@@ -7,8 +7,8 @@ import static capers.Utils.*;
  * @author Sol1tudeRain
  * The structure of a Capers Repository is as follows:
  *
- * .capers/ -- top level folder for all persistent data in your lab12 folder
- *    - dogs/ -- folder containing all of the persistent data for dogs
+ * .capers/ -- top level folder for all persistent data in your lab6 folder
+ *    - dogs/ -- folder containing all persistent data for dogs
  *    - story -- file containing the current story
  *
  *
@@ -27,7 +27,7 @@ public class CapersRepository {
      * Remember: recommended structure (you do not have to follow):
      *
      * .capers/ -- top level folder for all persistent data in your lab12 folder
-     *    - dogs/ -- folder containing all of the persistent data for dogs
+     *    - dogs/ -- folder containing all persistent data for dogs
      *    - story -- file containing the current story
      */
     public static void setupPersistence() {

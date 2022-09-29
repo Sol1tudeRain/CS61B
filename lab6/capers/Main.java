@@ -32,7 +32,7 @@ public class Main {
      *  YOUR PROGRAM SHOULD CREATE THESE FOLDERS/FILES*
      *
      * .capers/ -- top level folder for all persistent data in your lab12 folder
-     *    - dogs/ -- folder containing all of the persistent data for dogs
+     *    - dogs/ -- folder containing all of persistent data for dogs
      *    - story -- file containing the current story
      *
      * @param args arguments from the command line
@@ -41,7 +41,6 @@ public class Main {
         if (args.length == 0) {
             Utils.exitWithError("Must have at least one argument");
         }
-
 
         CapersRepository.setupPersistence();
         String text;
