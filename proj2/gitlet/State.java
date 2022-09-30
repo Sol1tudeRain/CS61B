@@ -30,7 +30,9 @@ public class State implements Serializable {
         this.removedFiles=new LinkedList<>();
     }
 
+    /** Save the state object to hard disk */
     public void save(){
         writeObject(STATE_PATH,this);
     }
+
 }

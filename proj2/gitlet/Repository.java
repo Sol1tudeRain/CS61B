@@ -3,72 +3,56 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static gitlet.MyUtils.*;
 import static gitlet.Utils.*;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 /**
- * Represents a gitlet repository.
  * This class contains some methods used in Main.
- *
- * In CWD, files are named by their original name, like "main.java",
- * but in staging area and blobs directory, files are named by their SHA-1 value,
+ * <p></p>
+ * In CWD, files are named by their original name, like "t.txt",
+ * but in staging area directory and blobs directory, files are named by their SHA-1 value,
  * like "2ef7bde608ce5404e97d5f042f95f89f1c232871".
- * By the way, commits objects are also using SHA-1 value as their names.
+ * And commits objects are also using SHA-1 value as their names.
  * @author Sol1tueRain
  */
 public class Repository {
-    /**
-     *
-     * List all instance variables of the Repository class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided two examples for you.
-     */
-
-    /**
-     * The current working directory.
-     */
+     /** The current working directory */
     public static final File CWD = new File(System.getProperty("user.dir"));
-    /**
-     * The .gitlet directory.
-     */
+
+    /** The .gitlet directory */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
-    /**
-     * The staging area directory
-     */
+
+    /**　The staging area directory　*/
     public static final File STAGING_DIR = join(GITLET_DIR, "stagingArea");
-    /**
-     * The commits directory
-     */
+
+    /**　The commits directory */
     public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
-    /** Where to store backups */
+
+    /** Where to store blobs */
     public static final File BLOBS_DIR = join(GITLET_DIR,"blobs");
 
-    /**
-     * Where to store gitlet state
-     */
+    /** Where to store gitlet state object */
     public static final File STATE_PATH = join(GITLET_DIR, "state");
 
-    /**
-     * A method for test
-     */
+     /** A main method for test */
     public static void main(String[] args) throws IOException {
-        File src=join(CWD,"t.txt");
-        File des=join(CWD,"p.txt");
-        Files.copy(src.toPath(),des.toPath());
+        restrictedDelete(join(CWD,"abc"));
+        Date date=new Date(0);
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy ZZZZ",Locale.ENGLISH);
+        String str=formatter.format(date);
+        System.out.println(str);
     }
-    /**
-     * For init command
-     */
     public static void init() {
-        // If there is already a Gitlet version-control system in the current directory, abort.
+        // If there is already a Gitlet version-control system in the current directory, abort. */
         if (GITLET_DIR.exists()) {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             System.exit(0);
         }
 
-        // Make directories
+        // Make directories.
         GITLET_DIR.mkdir();
         STAGING_DIR.mkdir();
         COMMITS_DIR.mkdir();
@@ -76,21 +60,21 @@ public class Repository {
 
         // First commit
         Commit initCommit = new Commit("initial commit");
-        initCommit.date = new Date(0).toString();//Set the timestamp to 00:00:00 UTC, Thursday, 1 January 1970
-        initCommit.parentID = null;// The init commit has no parent
-        initCommit.UID = sha1(serialize(initCommit));
-        /**
-         * Every commit object's path is named by its SHA-1 value
-         */
-        File initCommitPath = join(COMMITS_DIR, initCommit.UID);
-        writeObject(initCommitPath, initCommit);
 
-        // Initialize gitlet state
+        // Set the timestamp to 00:00:00 UTC, Thursday, 1 January 1970
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy ZZZZ",Locale.ENGLISH);
+        Date date=new Date(0);
+        initCommit.date =formatter.format(date);
+        initCommit.parentID = null;// The init commit has no parent
+        initCommit.UID = sha1(serialize(initCommit));// Every commit has a unique ID, which is its SHA-1 value
+        initCommit.save();// Write the commit to hard disk
+
+        // Create and initialize gitlet state
         State gitletState = new State();
-        gitletState.HEAD = initCommit.UID; //Set the current commit to init commit
-        gitletState.branches.put("master", initCommit.UID);//Add master to branches map, which maps from name to ID
-        gitletState.currentBranch = "master";//Set the current branch to master
-        writeObject(STATE_PATH, gitletState);
+        gitletState.HEAD = initCommit.UID; // Set the current commit to init commit.
+        gitletState.branches.put("master", initCommit.UID);// Add master to branches map, which maps from name to ID.
+        gitletState.currentBranch = "master";// The default branch is master.
+        gitletState.save();
     }
 
     public static void add(String fileName) throws IOException {
@@ -102,32 +86,29 @@ public class Repository {
         }
 
         State gitletState = getState();
-        /**
+        /*
          * If the current working version of the file is identical to the version in the current commit,
          * do not stage it to be added, and remove it from the staging area
          * if it is already there (as can happen when a file is changed, added,
          * and then changed back to its original version).
          */
         Commit currentCommit=getCommit(gitletState.HEAD);
-        String fileID=currentCommit.trackedFiles.get(fileName); //Get the ID of the tracked file
+        String fileID=currentCommit.trackedFiles.get(fileName); //Get the ID of the tracked file.
 
-        /** If there exists a tracked file with the same name*/
+        // If there exists a tracked file with the same name
         if(fileID!=null){
             File trackedFile=join(BLOBS_DIR,fileID);
-            /**
-             *  If the current working version of the file is identical to the version in the current commit,
-             *  remove it from the staging area and exit.
-             */
+            // If two files are the same
             if(Files.mismatch(trackedFile.toPath(),fileToAdd.toPath())==-1L){
                 gitletState.stagedFiles.remove(fileName);
                 File stagedFile=join(STAGING_DIR,fileID);
-                stagedFile.delete();
+                restrictedDelete(stagedFile);
                 gitletState.save();
                 System.exit(0);
             }
         }
 
-        String fileToAddID=sha1(readContentsAsString(fileToAdd));
+        String fileToAddID=sha1(readContentsAsString(fileToAdd));// Produce file ID
         File des = join(STAGING_DIR, fileToAddID);
         Files.copy(fileToAdd.toPath(), des.toPath(), REPLACE_EXISTING);
         gitletState.stagedFiles.put(fileName,fileToAddID);
@@ -141,9 +122,8 @@ public class Repository {
             System.exit(0);
         }
         State gitletState = getState();
-        /**
-         * If no files have been staged, abort.
-         */
+
+        //If no files have been staged, abort.
         if(gitletState.stagedFiles.isEmpty()){
             System.out.println("No changes added to the commit.");
         }
@@ -153,23 +133,25 @@ public class Repository {
         Commit newCommit= (Commit) currentCommit.clone();
         newCommit.parentID= currentCommit.UID;
         newCommit.message=message;
-        newCommit.date=new Date().toString();
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy ZZZZ", Locale.ENGLISH);
+        newCommit.date=formatter.format(new Date());
 
-        /**
-         * The new commit will save and start tracking any files that were staged for addition
-         */
+        // The new commit will save and start tracking any files that were staged for addition.
         gitletState.stagedFiles.forEach((fileName,fileID)->{
+            newCommit.trackedFiles.put(fileName,fileID);
             File stagedFilePath=join(STAGING_DIR,fileID);
             File des=join(BLOBS_DIR,fileID);
-            try {
-                Files.copy(stagedFilePath.toPath(),des.toPath(),REPLACE_EXISTING);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            // If there is a file with the same ID, don't need to copy because same ID implies same contents.
+            if(des.exists()){
+                try {
+                    Files.copy(stagedFilePath.toPath(),des.toPath());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
-            newCommit.trackedFiles.put(fileName,fileID);
         });
 
-        /**
+        /*
          * Files tracked in the current commit will be untracked
          * in the new commit as a result being staged for removal by the rm
          */
@@ -192,25 +174,25 @@ public class Repository {
         Commit currentCommit=getCommit(gitletState.HEAD);
         boolean staged=gitletState.stagedFiles.containsKey(fileName);
         boolean tracked=currentCommit.trackedFiles.containsKey(fileName);
-        /**
-         *  If the file is neither staged nor tracked by the head commit, abort.
-         */
+         // If the file is neither staged nor tracked by the head commit, abort.
         if(!staged&&!tracked){
             System.out.println("No reason to remove the file.");
             System.exit(0);
         }
 
+        // Unstage the file if it is currently staged for addition.
         if(staged){
+            File fileToUnstage=join(STAGING_DIR,fileName);
+            restrictedDelete(fileToUnstage);
             gitletState.stagedFiles.remove(fileName);
             gitletState.save();
         }
-
+        /* If the file is tracked in the current commit, stage it for removal
+           and remove the file from the working directory if the user has not already done so. */
         if(tracked){
             gitletState.removedFiles.addLast(fileName);
             File fileToRemove = join(CWD,fileName);
-            if(fileToRemove.exists()){
-                fileToRemove.delete();
-            }
+            restrictedDelete(fileToRemove);
         }
     }
 

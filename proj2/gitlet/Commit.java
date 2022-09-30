@@ -1,38 +1,32 @@
 package gitlet;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
 import static gitlet.Repository.COMMITS_DIR;
 import static gitlet.Utils.*;
 
 
 /** Represents a gitlet commit object.
- *  This file defines what the structure of a commit class looks like
+ *  This file defines the structure of commit object
  *  and includes some methods.
  *
  *  @author Sol1tudeRain
  */
 public class Commit implements Serializable, Cloneable{
-    /**
-     *
-     * List all instance variables of the Commit class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided one example for `message`.
-     */
 
-
-    /** The variables of this Commit. */
     public String message;
     public String parentID;
     public String date;
     public String UID;
 
-    /** A map used to save the relationship between filenames and their contents.
-     *  Filenames are normal names and contents are referred to by SHA-1 ID.
+    /**
+     *  A map used to save mappings from filenames to the corresponding IDs.
+     *  Filenames are normal names and contents are referred to by SHA-1 value.
      */
     public HashMap<String,String> trackedFiles;
 
@@ -41,14 +35,15 @@ public class Commit implements Serializable, Cloneable{
         this.trackedFiles=new HashMap<>();
     }
 
+    /** Save this commit object to hard disk. */
     public void save(){
         File commitPath=join(COMMITS_DIR,this.UID);
         writeObject(commitPath,this);
     }
-    @SuppressWarnings("unchecked")
+    //@SuppressWarnings("unchecked")
     @Override
     public Object clone() throws CloneNotSupportedException {
-        Commit ret=(Commit)super.clone(); // "ret" is the abbreviation of return
+        Commit ret=(Commit)super.clone();
         ret.trackedFiles=(HashMap<String,String>)trackedFiles.clone();
         return ret;
     }
