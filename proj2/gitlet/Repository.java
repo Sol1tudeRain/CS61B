@@ -118,14 +118,14 @@ public class Repository {
 
     public static void commit(String message) throws CloneNotSupportedException{
         // There must be a message for every commit.
-        if(message==null){
+        if(message==null||message.equals("")){
             System.out.println("Please enter a commit message.");
             System.exit(0);
         }
         State gitletState = getState();
 
         //If no files have been staged, abort.
-        if(gitletState.stagedFiles.isEmpty()){
+        if(gitletState.stagedFiles.isEmpty()&&gitletState.removedFiles.isEmpty()){
             System.out.println("No changes added to the commit.");
         }
 
@@ -165,6 +165,7 @@ public class Repository {
 
         clearDir(STAGING_DIR);
         gitletState.stagedFiles.clear();
+        gitletState.removedFiles.clear();
         gitletState.HEAD= newCommit.UID;
         gitletState.branches.put(gitletState.currentBranch, gitletState.HEAD);
         gitletState.save();

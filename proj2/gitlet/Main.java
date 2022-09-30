@@ -45,7 +45,7 @@ public class Main {
             case "log":
                 log();
                 break;
-            case "global_log":
+            case "global-log":
                 global_log();
                 break;
             case "find":
