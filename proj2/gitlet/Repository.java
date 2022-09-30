@@ -102,7 +102,7 @@ public class Repository {
             if(Files.mismatch(trackedFile.toPath(),fileToAdd.toPath())==-1L){
                 gitletState.stagedFiles.remove(fileName);
                 File stagedFile=join(STAGING_DIR,fileID);
-                restrictedDelete(stagedFile);
+                stagedFile.delete();
                 gitletState.save();
                 System.exit(0);
             }
