@@ -21,13 +21,13 @@ public class State implements Serializable {
     public String currentBranch;
     public HashMap<String,String> stagedFiles; //Stores stagedFiles name and SHA-1 value pairs
 
-    public LinkedList<String> removedFiles;
+    public HashSet<String> removedFiles;
 
     State(){
         this.branches=new HashMap<>();
         this.currentBranch="master";
         this.stagedFiles=new HashMap<>();
-        this.removedFiles=new LinkedList<>();
+        this.removedFiles=new HashSet<>();
     }
 
     /** Save the state object to hard disk */

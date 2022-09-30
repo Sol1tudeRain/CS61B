@@ -112,6 +112,8 @@ public class Repository {
         File des = join(STAGING_DIR, fileToAddID);
         Files.copy(fileToAdd.toPath(), des.toPath(), REPLACE_EXISTING);
         gitletState.stagedFiles.put(fileName,fileToAddID);
+
+        gitletState.removedFiles.remove(fileName);
         gitletState.save();
     }
 
@@ -191,7 +193,7 @@ public class Repository {
         /* If the file is tracked in the current commit, stage it for removal
            and remove the file from the working directory if the user has not already done so. */
         if(tracked){
-            gitletState.removedFiles.addLast(fileName);
+            gitletState.removedFiles.add(fileName);
             File fileToRemove = join(CWD,fileName);
             restrictedDelete(fileToRemove);
             gitletState.save();
@@ -260,8 +262,8 @@ public class Repository {
         }
 
         System.out.println("\n=== Removed Files ===");
-        Collections.sort(gitletState.removedFiles);
-        for(String fileName:gitletState.removedFiles){
+        TreeSet<String> sortedSet=new TreeSet<>(gitletState.removedFiles);
+        for(String fileName:sortedSet){
             System.out.println(fileName);
         }
 
