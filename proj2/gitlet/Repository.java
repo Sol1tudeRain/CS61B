@@ -142,7 +142,7 @@ public class Repository {
             File stagedFilePath=join(STAGING_DIR,fileID);
             File des=join(BLOBS_DIR,fileID);
             // If there is a file with the same ID, don't need to copy because same ID implies same contents.
-            if(des.exists()){
+            if(!des.exists()){
                 try {
                     Files.copy(stagedFilePath.toPath(),des.toPath());
                 } catch (IOException e) {
@@ -182,7 +182,8 @@ public class Repository {
 
         // Unstage the file if it is currently staged for addition.
         if(staged){
-            File fileToUnstage=join(STAGING_DIR,fileName);
+            String fileID=gitletState.stagedFiles.get(fileName);
+            File fileToUnstage=join(STAGING_DIR,fileID);
             restrictedDelete(fileToUnstage);
             gitletState.stagedFiles.remove(fileName);
             gitletState.save();
