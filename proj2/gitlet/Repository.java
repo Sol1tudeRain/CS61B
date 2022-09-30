@@ -194,6 +194,7 @@ public class Repository {
             gitletState.removedFiles.addLast(fileName);
             File fileToRemove = join(CWD,fileName);
             restrictedDelete(fileToRemove);
+            gitletState.save();
         }
     }
 
