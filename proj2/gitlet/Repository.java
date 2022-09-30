@@ -86,6 +86,7 @@ public class Repository {
         }
 
         State gitletState = getState();
+        gitletState.removedFiles.remove(fileName);
         /*
          * If the current working version of the file is identical to the version in the current commit,
          * do not stage it to be added, and remove it from the staging area
@@ -112,8 +113,6 @@ public class Repository {
         File des = join(STAGING_DIR, fileToAddID);
         Files.copy(fileToAdd.toPath(), des.toPath(), REPLACE_EXISTING);
         gitletState.stagedFiles.put(fileName,fileToAddID);
-
-        gitletState.removedFiles.remove(fileName);
         gitletState.save();
     }
 
