@@ -184,7 +184,7 @@ public class Repository {
         if(staged){
             String fileID=gitletState.stagedFiles.get(fileName);
             File fileToUnstage=join(STAGING_DIR,fileID);
-            restrictedDelete(fileToUnstage);
+            fileToUnstage.delete();
             gitletState.stagedFiles.remove(fileName);
             gitletState.save();
         }
