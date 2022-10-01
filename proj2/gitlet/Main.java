@@ -57,18 +57,20 @@ public class Main {
             case "checkout":
                 if(args.length==2){
                     checkoutBranch(args[1]);
-                } else if (args.length==3) {
+                } else if (args.length==3&&args[1].equals("--")) {
                     try{
                         checkout(args[2]);
                     }catch (IOException ignored){
 
                     }
-                } else if (args.length==4) {
+                } else if (args.length==4&&args[2].equals("--")) {
                     try{
                         checkout(args[1],args[3]);
                     }catch (IOException ignored){
 
                     }
+                }else{
+                    System.out.println("Incorrect operands.");
                 }
                 break;
             case "branch":

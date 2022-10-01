@@ -28,11 +28,15 @@ public class MyUtils {
         if(commitID.length()<40){
             State gitletState=getState();
             ID=gitletState.shortID.get(commitID);
+            if(ID==null){
+                return null;
+            }
         }else {
             ID=commitID;
         }
+
         File commitPath=join(COMMITS_DIR,ID);
-        if(ID!=null&&commitPath.exists()){
+        if(commitPath.exists()){
             return readObject(commitPath,Commit.class);
         }else {
             return null;
