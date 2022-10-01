@@ -449,6 +449,7 @@ public class Repository {
         }
 
         gitletState.HEAD=commitID;
+        gitletState.branches.put(gitletState.currentBranch,gitletState.HEAD);
         gitletState.stagedFiles.clear();
         clearDir(STAGING_DIR);
         gitletState.removedFiles.clear();
