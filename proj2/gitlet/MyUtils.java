@@ -24,8 +24,15 @@ public class MyUtils {
 
     /** Return a commit object with the specified ID */
     public static Commit getCommit(String commitID){
-        File commitPath=join(COMMITS_DIR,commitID);
-        if(commitPath.exists()){
+        String ID;
+        if(commitID.length()<40){
+            State gitletState=getState();
+            ID=gitletState.shortID.get(commitID);
+        }else {
+            ID=commitID;
+        }
+        File commitPath=join(COMMITS_DIR,ID);
+        if(ID!=null&&commitPath.exists()){
             return readObject(commitPath,Commit.class);
         }else {
             return null;

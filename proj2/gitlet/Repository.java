@@ -37,6 +37,7 @@ public class Repository {
     /** Where to store gitlet state object */
     public static final File STATE_PATH = join(GITLET_DIR, "state");
 
+
      /** A main method for test */
     public static void main(String[] args) throws IOException {
         restrictedDelete(join(CWD,"abc"));
@@ -161,6 +162,7 @@ public class Repository {
         }
 
         newCommit.UID=sha1(serialize(newCommit));
+        gitletState.shortID.put(newCommit.UID, newCommit.UID.substring(0,4));
         newCommit.save();
 
         clearDir(STAGING_DIR);
@@ -306,6 +308,11 @@ public class Repository {
      */
     public static void checkout(String commitID,String fileName) throws IOException {
         Commit commit=getCommit(commitID);
+        // If no commit with the given id exists
+        if(commit==null){
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
         String blobID=commit.trackedFiles.get(fileName);
         //If the file does not exist in the denoted commit, abort.
         if(blobID==null){
@@ -346,17 +353,26 @@ public class Repository {
             System.out.println("No such branch exists.");
             System.exit(0);
         }
-        Commit commit=getCommit(commitID);
-        // Any files that are tracked in the current branch but are not present in the checked-out branch are deleted.
-        //List<String> fileNames=plainFilenamesIn(CWD);
+
         Commit currentCommit=getCommit(gitletState.HEAD);
+        Commit commit=getCommit(commitID);
+        List<String> fileNames=plainFilenamesIn(CWD);
+        // If a working file is untracked in the current branch and would be overwritten by the checkout, abort.
+        for(String fileName:fileNames){
+            if(!currentCommit.trackedFiles.containsKey(fileName)&&commit.trackedFiles.containsKey(fileName)){
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.exit(0);
+            }
+        }
+
+        // Any files that are tracked in the current branch but are not present in the checked-out branch are deleted.
         for(String fileName:currentCommit.trackedFiles.keySet()){
             if(!commit.trackedFiles.containsKey(fileName)){
                 File fileToDelete=join(CWD,fileName);
                 restrictedDelete(fileToDelete);
             }
         }
-        /**
+        /*
          * Takes all files in the commit at the head of the given branch,
          * and puts them in the working directory, overwriting the versions of the files
          * that are already there if they exist.

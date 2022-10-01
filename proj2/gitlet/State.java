@@ -19,15 +19,20 @@ public class State implements Serializable {
     public HashMap<String,String> branches; // Stores branch name and SHA-1 value pairs
     public String HEAD;
     public String currentBranch;
-    public HashMap<String,String> stagedFiles; //Stores stagedFiles name and SHA-1 value pairs
+    /** Stores stagedFiles name and SHA-1 value pairs */
+    public HashMap<String,String> stagedFiles;
 
     public HashSet<String> removedFiles;
+
+    /** Map abbreviated commit UID to full UID */
+    public HashMap<String,String> shortID=new HashMap<>();
 
     State(){
         this.branches=new HashMap<>();
         this.currentBranch="master";
         this.stagedFiles=new HashMap<>();
         this.removedFiles=new HashSet<>();
+        this.shortID=new HashMap<>();
     }
 
     /** Save the state object to hard disk */
