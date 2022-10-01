@@ -162,7 +162,7 @@ public class Repository {
         }
 
         newCommit.UID=sha1(serialize(newCommit));
-        gitletState.shortID.put(newCommit.UID.substring(0,4), newCommit.UID);
+        gitletState.shortID.put(newCommit.UID.substring(0,8), newCommit.UID);
         newCommit.save();
 
         clearDir(STAGING_DIR);
