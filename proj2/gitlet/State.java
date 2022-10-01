@@ -25,7 +25,7 @@ public class State implements Serializable {
     public HashSet<String> removedFiles;
 
     /** Map abbreviated commit UID to full UID */
-    public HashMap<String,String> shortID=new HashMap<>();
+    public HashMap<String,String> shortID;
 
     State(){
         this.branches=new HashMap<>();
