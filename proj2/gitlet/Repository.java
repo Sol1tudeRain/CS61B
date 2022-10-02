@@ -64,6 +64,7 @@ public class Repository {
         Date date=new Date(0);
         initCommit.date =formatter.format(date);
         initCommit.UID = sha1(serialize(initCommit));// Every commit has a unique ID, which is its SHA-1 value
+        initCommit.parents.add(null);
         initCommit.save();
 
         // Create and initialize gitlet state
@@ -99,10 +100,10 @@ public class Repository {
 
         /* Check if the current working version of the file
            is identical to the version in the current commit if there is one. */
-        if(trackedFileID!=null&&trackedFileID.equals(fileToAddID)){
+        if(fileToAddID.equals(trackedFileID)){
             gitletState.stagedFilesForAddition.remove(fileName);
-            File stagedFileToAdd=join(fileToAddID);
-            stagedFileToAdd.delete();
+            File stagedFile=join(STAGING_DIR,fileToAddID);
+            safeDelete(stagedFile);
             gitletState.save();
             System.exit(0);
         }
