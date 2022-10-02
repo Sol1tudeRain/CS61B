@@ -538,9 +538,9 @@ public class Repository {
             boolean not_in_Other = fileID_Other == null;
             boolean in_Other = !not_in_Other;
 
-            boolean modified_in_HEAD = Objects.equals(fileID_HEAD, fileID_Split);
+            boolean modified_in_HEAD = in_HEAD&&Objects.equals(fileID_HEAD, fileID_Split);
             boolean unmodified_in_HEAD = !modified_in_HEAD;
-            boolean modified_in_Other = Objects.equals(fileID_Other, fileID_Split);
+            boolean modified_in_Other = in_Other&&Objects.equals(fileID_Other, fileID_Split);
             boolean unmodified_in_Other = !modified_in_Other;
             boolean in_the_same_way = Objects.equals(fileID_HEAD, fileID_Other);
             boolean not_in_the_same_way = !in_the_same_way;
