@@ -522,6 +522,18 @@ public class Repository {
         Commit Other = getCommit(givenBranch);
         Commit Split = getSplitPoint(currentBranch, givenBranch);
 
+        // If the split point is the same commit as the given branch, then we do nothing.
+        if(Other.UID.equals(Split.UID)){
+            System.out.println("Given branch is an ancestor of the current branch.");
+            System.exit(0);
+        }
+        // If the split point is the current branch, then the effect is to check out the given branch.
+        if(HEAD.UID.equals(Split.UID)){
+            checkoutBranch(branchName);
+            System.out.println("Current branch fast-forwarded.");
+            System.exit(0);
+        }
+
         boolean conflict = false;
 
         Commit newCommit = (Commit) HEAD.clone();
@@ -547,9 +559,9 @@ public class Repository {
             boolean not_in_Other = fileID_Other == null;
             boolean in_Other = !not_in_Other;
 
-            boolean modified_in_HEAD = in_HEAD&&Objects.equals(fileID_HEAD, fileID_Split);
+            boolean modified_in_HEAD = in_HEAD&&!Objects.equals(fileID_HEAD, fileID_Split);
             boolean unmodified_in_HEAD = !modified_in_HEAD;
-            boolean modified_in_Other = in_Other&&Objects.equals(fileID_Other, fileID_Split);
+            boolean modified_in_Other = in_Other&&!Objects.equals(fileID_Other, fileID_Split);
             boolean unmodified_in_Other = !modified_in_Other;
             boolean in_the_same_way = Objects.equals(fileID_HEAD, fileID_Other);
             boolean not_in_the_same_way = !in_the_same_way;
