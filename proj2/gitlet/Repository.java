@@ -227,10 +227,19 @@ public class Repository {
         State gitletState = getState();
         Commit commit = getCommit(gitletState.HEAD);
         while (true) {
-            System.out.println("===\n" +
-                    "commit " + commit.UID + "\n" +
-                    "Date: " + commit.date + "\n" +
-                    commit.message + "\n");
+            if(commit.parents.size()==2){
+                System.out.println("===\n" +
+                        "commit " + commit.UID + "\n" +
+                        "Merge: " + commit.parents.get(0)+" "+commit.parents.get(1) + "\n" +
+                        "Date: " + commit.date + "\n" +
+                        commit.message + "\n");
+            }else {
+                System.out.println("===\n" +
+                        "commit " + commit.UID + "\n" +
+                        "Date: " + commit.date + "\n" +
+                        commit.message + "\n");
+            }
+
             if (commit.parents.get(0) == null) {
                 break;
             } else {
