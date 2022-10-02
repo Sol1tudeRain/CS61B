@@ -230,7 +230,7 @@ public class Repository {
             if(commit.parents.size()==2){
                 System.out.println("===\n" +
                         "commit " + commit.UID + "\n" +
-                        "Merge: " + commit.parents.get(0)+" "+commit.parents.get(1) + "\n" +
+                        "Merge: " + commit.parents.get(0).substring(0,7)+" "+commit.parents.get(1).substring(0,7) + "\n" +
                         "Date: " + commit.date + "\n" +
                         commit.message + "\n");
             }else {
