@@ -97,8 +97,9 @@ public class Repository {
         String trackedFileID=currentCommit.trackedFiles.get(fileName); //Get the ID of the tracked file.
         String fileToAddID=sha1(readContentsAsString(fileToAdd)); // Produce ID of the file to add.
 
-        // Check if the current working version of the file is identical to the version in the current commit.
-        if(trackedFileID.equals(fileToAddID)){
+        /* Check if the current working version of the file
+           is identical to the version in the current commit if there is one. */
+        if(trackedFileID!=null&&trackedFileID.equals(fileToAddID)){
             gitletState.stagedFilesForAddition.remove(fileName);
             File stagedFileToAdd=join(fileToAddID);
             stagedFileToAdd.delete();
