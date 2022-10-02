@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static gitlet.MyUtils.*;
 import static gitlet.Utils.*;
@@ -131,6 +132,9 @@ public class Repository {
         // By default, each commit’s snapshot of files will be exactly the same as its parent commit’s
         Commit newCommit= (Commit) currentCommit.clone();
 
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy ZZZZ", Locale.ENGLISH);
+        newCommit.date=formatter.format(new Date());
+        newCommit.parents=new LinkedList<>();
         newCommit.parents.add(currentCommit.UID);
         newCommit.message=message;
 
@@ -464,7 +468,136 @@ public class Repository {
 
     }
 
-    public static void merge(String branchName){
+    public static void merge(String branchName) throws CloneNotSupportedException {
+        State gitlet=getState();
+        // If there are staged additions or removals
+        if(!gitlet.stagedFilesForAddition.isEmpty()||!gitlet.stagedFilesForRemoval.isEmpty()){
+            System.out.println("You have uncommitted changes.");
+            System.exit(0);
+        }
+
+        // If attempting to merge a branch with itself
+        if(branchName.equals(gitlet.currentBranch)){
+            System.out.println("Cannot merge a branch with itself.");
+            System.exit(0);
+        }
+
+        String givenBranch=gitlet.branches.get(branchName);
+        // If a branch with the given name does not exist
+        if(givenBranch==null){
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+
+        String currentBranch=gitlet.HEAD;
+        Commit HEAD=getCommit(currentBranch);
+        Commit Other=getCommit(givenBranch);
+        Commit Split=getSplitPoint(currentBranch,givenBranch);
+
+        Boolean conflict= false;
+
+        Commit newCommit=(Commit) HEAD.clone();
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy ZZZZ", Locale.ENGLISH);
+        newCommit.date=formatter.format(new Date());
+        newCommit.message="Merged "+branchName+" into "+gitlet.currentBranch+".";
+        newCommit.parents=new LinkedList<>();
+        newCommit.parents.add(currentBranch);
+        newCommit.parents.add(givenBranch);
+
+        HashSet<String> namesOfAllFilesToHandle=new HashSet<>();
+        namesOfAllFilesToHandle.addAll(HEAD.trackedFiles.keySet());
+        namesOfAllFilesToHandle.addAll(Other.trackedFiles.keySet());
+        namesOfAllFilesToHandle.addAll(Split.trackedFiles.keySet());
+        
+        for(String fileName:namesOfAllFilesToHandle) {
+            String fileID_Split = Split.trackedFiles.get(fileName);
+            String fileID_HEAD = HEAD.trackedFiles.get(fileName);
+            String fileID_Other = Other.trackedFiles.get(fileName);
+
+            boolean not_in_Split = fileID_Split == null;
+            boolean in_Split = !not_in_Split;
+            boolean not_in_HEAD = fileID_HEAD == null;
+            boolean in_HEAD = !not_in_HEAD;
+            boolean not_in_Other = fileID_Other == null;
+            boolean in_Other = !not_in_Other;
+            boolean modified_in_HEAD = !fileID_HEAD.equals(fileID_Split);
+            boolean unmodified_in_HEAD = !modified_in_HEAD;
+            boolean modified_in_Other = !fileID_Other.equals(fileID_Split);
+            boolean unmodified_in_Other = !modified_in_Other;
+
+            // If two files have changed in the same way or both are not modified.
+            boolean in_the_same_way = (not_in_Split && not_in_HEAD) || fileID_HEAD.equals(fileID_Other);
+            boolean not_in_the_same_way = !in_the_same_way;
+
+            // 1. Modified in Other but not modified in HEAD -->checkout
+            if (modified_in_Other && unmodified_in_HEAD) {
+                newCommit.trackedFiles.put(fileName, fileID_Other);
+                File src = join(BLOBS_DIR, fileID_Other);
+                File des = join(CWD, fileName);
+                try {
+                    Files.copy(src.toPath(), des.toPath(), REPLACE_EXISTING);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // 2. Modified in HEAD but not modified in Other -->do nothing
+            } else if (modified_in_HEAD && unmodified_in_Other) {
+                ;
+                // 3. If two files have changed in the same way or both are not modified -->do nothing
+            } else if (in_the_same_way) {
+                ;
+
+                // 4. Present only in HEAD -->do nothing
+            } else if (not_in_Split && not_in_Other && in_HEAD) {
+                ;
+
+                // 5. Present only in Other -->checkout
+            } else if (not_in_Split && not_in_HEAD && in_Other) {
+                newCommit.trackedFiles.put(fileName, fileID_Other);
+                File src = join(BLOBS_DIR, fileID_Other);
+                File des = join(CWD, fileName);
+                try {
+                    Files.copy(src.toPath(), des.toPath(), REPLACE_EXISTING);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // 6. Present in Other, unmodified in HEAD and absent in Other -->remove
+            } else if (in_Split && unmodified_in_HEAD && not_in_Other) {
+                File fileToRemove = join(CWD, fileName);
+                safeDelete(fileToRemove);
+                newCommit.trackedFiles.remove(fileName);
+
+                // 7. Present in Other, unmodified in Other and absent in HEAD -->do nothing
+            } else if (in_Split && unmodified_in_Other && not_in_HEAD) {
+                ;
+
+                // 8. Modified in different ways -->conflict
+            } else if (not_in_the_same_way) {
+                conflict = true;
+                File conflictedFile = join(CWD, fileName);
+                File fileInHEAD = join(BLOBS_DIR, fileID_HEAD);
+                File fileInOther = join(BLOBS_DIR, fileID_Other);
+                String str = "<<<<<<< HEAD\n";
+                if (fileInHEAD.exists()) {
+                    str = str + readContentsAsString(fileInHEAD);
+                }
+                str = str + "=======\n";
+                if (fileInOther.exists()) {
+                    str = str + readContentsAsString(fileInOther);
+                }
+                str = str + ">>>>>>>";
+                writeContents(conflictedFile, str);
+                String conflictedFileID = sha1(str);
+                writeContents(join(BLOBS_DIR, conflictedFileID), str);
+                newCommit.trackedFiles.put(fileName, conflictedFileID);
+            }
+
+        }
+
+        if(conflict){
+            System.out.println("Encountered a merge conflict.");
+        }
 
     }
 }

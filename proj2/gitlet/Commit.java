@@ -18,7 +18,7 @@ import static gitlet.Utils.*;
 public class Commit implements Serializable, Cloneable{
 
     public String message;
-    public ArrayList<String> parents;
+    public LinkedList<String> parents;
     public String date;
     public String UID;
 
@@ -30,10 +30,8 @@ public class Commit implements Serializable, Cloneable{
 
     public Commit(String message) {
         this.message=message;
-        this.parents=new ArrayList<>();
+        this.parents=new LinkedList<>();
         this.trackedFiles=new HashMap<>();
-        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy ZZZZ", Locale.ENGLISH);
-        this.date=formatter.format(new Date());
     }
 
     /** Save this commit object. */
