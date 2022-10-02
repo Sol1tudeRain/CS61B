@@ -82,6 +82,13 @@ public class Main {
             case "reset":
                 reset(args[1]);
                 break;
+            case "merge":
+                try{
+                    merge(args[1]);
+                }catch (CloneNotSupportedException ignored){
+
+                }
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 break;

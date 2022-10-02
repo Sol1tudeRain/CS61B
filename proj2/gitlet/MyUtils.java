@@ -29,6 +29,7 @@ public class MyUtils {
             return readObject(STATE_PATH, State.class);
         }
         System.out.println("Not in an initialized Gitlet directory.");
+        System.exit(0);
         return null;
     }
 
