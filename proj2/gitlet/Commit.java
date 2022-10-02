@@ -3,9 +3,7 @@ package gitlet;
 import java.io.File;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 
 import static gitlet.Repository.COMMITS_DIR;
 import static gitlet.Utils.*;
@@ -20,27 +18,30 @@ import static gitlet.Utils.*;
 public class Commit implements Serializable, Cloneable{
 
     public String message;
-    public String parentID;
+    public ArrayList<String> parents;
     public String date;
     public String UID;
 
     /**
      *  A map used to save mappings from filenames to the corresponding IDs.
-     *  Filenames are normal names and contents are referred to by SHA-1 value.
+     *  Filenames are names and IDs are SHA-1 values.
      */
     public HashMap<String,String> trackedFiles;
 
     public Commit(String message) {
         this.message=message;
+        this.parents=new ArrayList<>();
         this.trackedFiles=new HashMap<>();
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy ZZZZ", Locale.ENGLISH);
+        this.date=formatter.format(new Date());
     }
 
-    /** Save this commit object to hard disk. */
+    /** Save this commit object. */
     public void save(){
         File commitPath=join(COMMITS_DIR,this.UID);
         writeObject(commitPath,this);
     }
-    //@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     @Override
     public Object clone() throws CloneNotSupportedException {
         Commit ret=(Commit)super.clone();

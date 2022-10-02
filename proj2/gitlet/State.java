@@ -16,26 +16,28 @@ import static gitlet.Utils.writeObject;
  */
 public class State implements Serializable {
 
-    public HashMap<String,String> branches; // Stores branch name and SHA-1 value pairs
+    /** Stores branch name and SHA-1 value pairs */
+    public HashMap<String,String> branches;
     public String HEAD;
     public String currentBranch;
-    /** Stores stagedFiles name and SHA-1 value pairs */
-    public HashMap<String,String> stagedFiles;
+    /** StagedFiles name and SHA-1 value pairs */
+    public HashMap<String,String> stagedFilesForAddition;
 
-    public HashSet<String> removedFiles;
+    /** Names of files staged for removal */
+    public HashSet<String> stagedFilesForRemoval;
 
     /** Map abbreviated commit UID to full UID */
-    public HashMap<String,String> shortID;
+    public HashMap<String,String> shortIDs;
 
     State(){
         this.branches=new HashMap<>();
         this.currentBranch="master";
-        this.stagedFiles=new HashMap<>();
-        this.removedFiles=new HashSet<>();
-        this.shortID=new HashMap<>();
+        this.stagedFilesForAddition=new HashMap<>();
+        this.stagedFilesForRemoval=new HashSet<>();
+        this.shortIDs=new HashMap<>();
     }
 
-    /** Save the state object to hard disk */
+    /** Save the state object */
     public void save(){
         writeObject(STATE_PATH,this);
     }
