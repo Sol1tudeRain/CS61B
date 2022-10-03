@@ -609,7 +609,7 @@ public class Repository {
                 if (fileInOther.exists()) {
                     str = str + readContentsAsString(fileInOther);
                 }
-                str = str + ">>>>>>>";
+                str = str + ">>>>>>>\n";
 
                 conflictFiles.put(fileName, str);
             }
