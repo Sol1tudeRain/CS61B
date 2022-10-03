@@ -599,14 +599,16 @@ public class Repository {
                 // 8. Modified in different ways -->conflict
             } else if (not_in_the_same_way) {
                 conflict = true;
-                File fileInHEAD = join(BLOBS_DIR, fileID_HEAD);
-                File fileInOther = join(BLOBS_DIR, fileID_Other);
+
+
                 String str = "<<<<<<< HEAD\n";
-                if (fileInHEAD.exists()) {
+                if (in_HEAD) {
+                    File fileInHEAD = join(BLOBS_DIR, fileID_HEAD);
                     str = str + readContentsAsString(fileInHEAD);
                 }
                 str = str + "=======\n";
-                if (fileInOther.exists()) {
+                if (in_Other) {
+                    File fileInOther = join(BLOBS_DIR, fileID_Other);
                     str = str + readContentsAsString(fileInOther);
                 }
                 str = str + ">>>>>>>\n";
