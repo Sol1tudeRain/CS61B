@@ -46,18 +46,18 @@ public class MyUtils {
             return null;
         }
 
-        String ID;
+        String id;
         if (commitID.length() == 8) {
             State gitletState = getState();
-            ID = gitletState.shortIDs.get(commitID);
-            if (ID == null) {
+            id = gitletState.shortIDs.get(commitID);
+            if (id == null) {
                 return null;
             }
         } else {
-            ID = commitID;
+            id = commitID;
         }
 
-        File commitPath = join(COMMITS_DIR, ID);
+        File commitPath = join(COMMITS_DIR, id);
         if (commitPath.exists()) {
             return readObject(commitPath, Commit.class);
         } else {
@@ -70,7 +70,7 @@ public class MyUtils {
      * Delete all files in a directory
      */
     public static void clearDir(File dirPath) {
-        File filesList[] = dirPath.listFiles();
+        File[] filesList = dirPath.listFiles();
         for (File file : filesList) {
             file.delete();
         }

@@ -227,13 +227,13 @@ public class Repository {
         State gitletState = getState();
         Commit commit = getCommit(gitletState.HEAD);
         while (true) {
-            if(commit.parents.size()==2){
+            if (commit.parents.size() == 2) {
                 System.out.println("===\n" +
                         "commit " + commit.UID + "\n" +
-                        "Merge: " + commit.parents.get(0).substring(0,7)+" "+commit.parents.get(1).substring(0,7) + "\n" +
+                        "Merge: " + commit.parents.get(0).substring(0, 7) + " " + commit.parents.get(1).substring(0, 7) + "\n" +
                         "Date: " + commit.date + "\n" +
                         commit.message + "\n");
-            }else {
+            } else {
                 System.out.println("===\n" +
                         "commit " + commit.UID + "\n" +
                         "Date: " + commit.date + "\n" +
@@ -523,12 +523,12 @@ public class Repository {
         Commit Split = getSplitPoint(currentBranch, givenBranch);
 
         // If the split point is the same commit as the given branch, then we do nothing.
-        if(Other.UID.equals(Split.UID)){
+        if (Other.UID.equals(Split.UID)) {
             System.out.println("Given branch is an ancestor of the current branch.");
             System.exit(0);
         }
         // If the split point is the current branch, then the effect is to check out the given branch.
-        if(HEAD.UID.equals(Split.UID)){
+        if (HEAD.UID.equals(Split.UID)) {
             checkoutBranch(branchName);
             System.out.println("Current branch fast-forwarded.");
             System.exit(0);
@@ -559,10 +559,10 @@ public class Repository {
             boolean not_in_Other = fileID_Other == null;
             boolean in_Other = !not_in_Other;
 
-            boolean modified_in_HEAD = in_HEAD&&!Objects.equals(fileID_HEAD, fileID_Split);
-            boolean unmodified_in_HEAD = in_HEAD&&Objects.equals(fileID_HEAD, fileID_Split);
-            boolean modified_in_Other = in_Other&&!Objects.equals(fileID_Other, fileID_Split);
-            boolean unmodified_in_Other = in_Other&&Objects.equals(fileID_Other, fileID_Split);
+            boolean modified_in_HEAD = in_HEAD && !Objects.equals(fileID_HEAD, fileID_Split);
+            boolean unmodified_in_HEAD = in_HEAD && Objects.equals(fileID_HEAD, fileID_Split);
+            boolean modified_in_Other = in_Other && !Objects.equals(fileID_Other, fileID_Split);
+            boolean unmodified_in_Other = in_Other && Objects.equals(fileID_Other, fileID_Split);
             boolean in_the_same_way = Objects.equals(fileID_HEAD, fileID_Other);
             boolean not_in_the_same_way = !in_the_same_way;
 
