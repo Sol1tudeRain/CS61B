@@ -560,9 +560,9 @@ public class Repository {
             boolean in_Other = !not_in_Other;
 
             boolean modified_in_HEAD = in_HEAD&&!Objects.equals(fileID_HEAD, fileID_Split);
-            boolean unmodified_in_HEAD = !modified_in_HEAD;
+            boolean unmodified_in_HEAD = in_HEAD&&Objects.equals(fileID_HEAD, fileID_Split);
             boolean modified_in_Other = in_Other&&!Objects.equals(fileID_Other, fileID_Split);
-            boolean unmodified_in_Other = !modified_in_Other;
+            boolean unmodified_in_Other = in_Other&&Objects.equals(fileID_Other, fileID_Split);
             boolean in_the_same_way = Objects.equals(fileID_HEAD, fileID_Other);
             boolean not_in_the_same_way = !in_the_same_way;
 
@@ -587,12 +587,12 @@ public class Repository {
                 newCommit.trackedFiles.put(fileName, fileID_Other);
                 filesToAdd.put(fileName, fileID_Other);
 
-                // 6. Present in Other, unmodified in HEAD and absent in Other -->remove
+                // 6. Present in Split, unmodified in HEAD and absent in Other -->remove
             } else if (in_Split && unmodified_in_HEAD && not_in_Other) {
                 newCommit.trackedFiles.remove(fileName);
                 filesToRemove.add(fileName);
 
-                // 7. Present in Other, unmodified in Other and absent in HEAD -->do nothing
+                // 7. Present in Split, unmodified in Other and absent in HEAD -->do nothing
             } else if (in_Split && unmodified_in_Other && not_in_HEAD) {
                 ;
 
