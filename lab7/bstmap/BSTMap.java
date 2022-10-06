@@ -10,7 +10,7 @@ import static bstmap.MyUtils.insert;
 public class BSTMap<K extends Comparable<K>,V> implements Map61B<K,V>{
 
     private int size;
-    public BSTNode<K,V> root;
+    private BSTNode<K,V> root;
     public BSTMap(){
         this.size=0;
         this.root=null;
@@ -30,6 +30,10 @@ public class BSTMap<K extends Comparable<K>,V> implements Map61B<K,V>{
      *  map contains no mapping for the key.
      */
     public V get(K key) {
+        if(key==null){
+            return null;
+        }
+
         return find(this.root,key);
     }
 
