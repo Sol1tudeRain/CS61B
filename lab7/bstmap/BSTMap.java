@@ -22,6 +22,9 @@ public class BSTMap<K extends Comparable<K>,V> implements Map61B<K,V>{
     }
 
     public boolean containsKey(K key) {
+        if(key==null){
+            return false;
+        }
         return find(this.root,key)!=null;
     }
 
