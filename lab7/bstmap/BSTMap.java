@@ -18,6 +18,7 @@ public class BSTMap<K extends Comparable<K>,V> implements Map61B<K,V>{
 
     public void clear() {
         this.root=null;
+        this.size=0;
     }
 
     public boolean containsKey(K key) {
@@ -38,6 +39,7 @@ public class BSTMap<K extends Comparable<K>,V> implements Map61B<K,V>{
 
     public void put(K key, V value) {
         if(!containsKey(key)){
+            this.size+=1;
             this.root=insert(this.root,key,value);
         }
     }
